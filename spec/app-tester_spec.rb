@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
+require 'tempfile'
 
 # Time to add your specs!
 # http://rspec.info/
@@ -12,11 +13,8 @@ describe "App Tester framework" do
   end
 
   it "should set options" do
-    apptester = AppTester.new do |options|
-      options.add_environment :production => "localhost://production"
-      options.add_environment :staging => "localhost://staging"
-      options.add_environment :development => "localhost://development"
-    end
+    apptester = start_app_tester
+
     apptester.options.environments.should be_a(Hash)
     apptester.options.environments.size.should eq(3)
     apptester.options.environments[:production].should eq("localhost://production")
@@ -25,11 +23,7 @@ describe "App Tester framework" do
   end
 
   it "should return help when asked for it" do
-    apptester = AppTester.new do |options|
-      options.add_environment :production => "localhost://production"
-      options.add_environment :staging => "localhost://staging"
-      options.add_environment :development => "localhost://development"
-    end
+    apptester = start_app_tester
 
     apptester.define_test "test arguments" do |options, connection|
       # blergh!
@@ -41,9 +35,7 @@ describe "App Tester framework" do
   end
 
   it "should define a test and run it" do
-    apptester = AppTester.new do |options|
-      options.add_environment :production => "localhost://production"
-    end
+    apptester = start_app_tester
 
     mock_arguments "-s" => "production"
 
@@ -63,11 +55,7 @@ describe "App Tester framework" do
   end
 
   it "should define a test without a default environment" do
-    apptester = AppTester.new do |options|
-      options.add_environment :production => "localhost://production"
-      options.add_environment :staging => "localhost://staging"
-      options.add_environment :development => "localhost://development"
-    end
+    apptester = start_app_tester
 
     apptester.define_test "test arguments" do |options, connection|
       options[:server].should eq("localhost://production")
@@ -77,12 +65,7 @@ describe "App Tester framework" do
   end
 
   it "should define a test with a default environment" do
-    apptester = AppTester.new do |options|
-      options.add_environment :production => "localhost://production"
-      options.add_environment :staging => "localhost://staging"
-      options.add_environment :development => "localhost://development"
-      options.default_environment = :staging
-    end
+    apptester = start_app_tester nil, :staging
 
     apptester.define_test "test arguments" do |options, connection|
       options[:server].should eq("localhost://staging")
@@ -92,12 +75,7 @@ describe "App Tester framework" do
   end
 
   it "should define a test, set custom options and run" do
-    apptester = AppTester.new do |options|
-      options.add_environment :production => "localhost://production"
-      options.add_environment :staging => "localhost://staging"
-      options.add_environment :development => "localhost://development"
-      options.default_environment = :staging
-    end
+    apptester = start_app_tester
 
     apptester.define_test "test arguments" do |options, connection|
       options.should be_a(Hash)
@@ -117,9 +95,7 @@ describe "App Tester framework" do
   end
 
   it "should create a connection" do
-    apptester = AppTester.new do |options|
-      options.add_environment :production => "http://www.google.com"
-    end
+    apptester = start_app_tester :production => "http://www.google.com"
 
     apptester.define_test "test arguments" do |options, connection|
       connection.should be_a(Faraday::Connection)
@@ -131,9 +107,7 @@ describe "App Tester framework" do
   end
 
   it "should fetch contents of a connection" do
-    apptester = AppTester.new do |options|
-      options.add_environment :production => "https://github.com"
-    end
+    apptester = start_app_tester :production => "https://github.com"
 
     apptester.define_test "test arguments" do |options, connection|
       response = connection.get do |req|
@@ -149,9 +123,7 @@ describe "App Tester framework" do
   end
 
   it "should return exception on connection failed" do
-    apptester = AppTester.new do |options|
-      options.add_environment :production => "http://aoisjdioasjdioasjod"
-    end
+    apptester = start_app_tester :production => "http://aoisjdioasjdioasjod"
 
     apptester.define_test "test arguments" do |options, connection|
       begin
@@ -168,9 +140,49 @@ describe "App Tester framework" do
     apptester.run_test("test arguments", mocked_arguments)
   end
 
-  # it should log connections if asked for
+  it "should log connections if asked for" do
+    apptester = start_app_tester({ :production => "https://github.com" }, nil, true)
+
+    apptester.define_test "test arguments" do |options, connection|
+      response = connection.get do |req|
+        req.url "/"
+      end
+    end
+
+    mocked_arguments = mock_arguments "-s" => "production"
+
+    read_stdout do
+      apptester.run_test("test arguments", mocked_arguments)
+    end.should include("DEBUG")
+  end
+  # it should retry connection if failed and specified number of retries
+  # it should output colors correctly
+  # it should throw exception on no name test
+  # it should throw exception on test not found
+  # it should time the execution
+  # it should time the execution with threshold
 
   def mock_arguments hash={ }
     hash.flatten
+  end
+
+  def start_app_tester(environments=nil, default_environment=nil, log_connections=nil, connection_retries=nil)
+    AppTester.new do |options|
+      (environments || { :production => "localhost://production", :staging => "localhost://staging", :development => "localhost://development" }).each do |k, v|
+        options.add_environment k => v
+      end
+      options.default_environment = default_environment unless default_environment.nil?
+      options.log_connections = log_connections unless log_connections.nil?
+      options.connection_retries = connection_retries unless connection_retries.nil?
+    end
+  end
+
+  def read_stdout
+    results = Tempfile.new('a').path
+    a = STDOUT.dup
+    STDOUT.reopen(results, 'w')
+    yield
+    STDOUT.reopen(a)
+    File.read(results)
   end
 end

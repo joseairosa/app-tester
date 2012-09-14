@@ -12,12 +12,6 @@ module AppTester
     # Public: Container of tests
     attr_reader :tests
 
-    STRING_SUCCESS="[\033[1;32mSUCCESS\033[0m]"
-    STRING_OK="[\033[1;34mOK\033[0m]"
-    STRING_DONE="[\033[1;32mDONE\033[0m]"
-    STRING_FAILED="[\033[1;31mFAILED\033[0m]"
-    STRING_WARNING="[\033[1;33mWARNING\033[0m]"
-
     def new
       @tests = {}
       @options = AppTester::Options.new

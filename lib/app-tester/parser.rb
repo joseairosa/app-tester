@@ -11,7 +11,6 @@ module AppTester
 
     # Public:
     attr_writer :num_arguments
-    POSASS = { }
 
     def initialize options
       @options = { }

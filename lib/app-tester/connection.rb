@@ -12,7 +12,7 @@ module AppTester
       # Make sure server choice makes sense
       raise OptionParser::InvalidArgument if url.nil?
 
-      AppTester::Utils.bold_me "Connecting to #{url}..."
+      puts AppTester::Utils::Colours.dark_gray "Connecting to #{url}..."
       retries = 0
       begin
         Faraday.new(:url => url, :ssl => { :verify => false }) do |builder|
