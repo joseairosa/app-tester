@@ -55,5 +55,5 @@ module AppTester
     alias load_library load_libraries
   end
 
-  load_libraries "core", "utils", "options", "test", "parser", "connection", "exceptions", "timer"
+  load_libraries "core", "utils", "options", "test", "parser", "connection", "exceptions", "timer", "checker"
 end

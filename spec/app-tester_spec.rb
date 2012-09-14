@@ -155,6 +155,23 @@ describe "App Tester framework" do
     apptester.run_test("my test", mocked_arguments)
   end
 
+  it "should check status" do
+    apptester = start_app_tester :production => "https://github.com"
+
+    apptester.define_test "my test" do |options, connection|
+      response = connection.get do |req|
+        req.url "/"
+      end
+      AppTester::Checker.status response
+    end
+
+    mocked_arguments = mock_arguments "-s" => "production"
+
+    read_stdout do
+      apptester.run_test("my test", mocked_arguments)
+    end.should include("[\033[0;32mSUCCESS\033[0m] got status")
+  end
+
   it "should log connections if asked for" do
     apptester = start_app_tester({ :production => "https://github.com" }, nil, true)
 
