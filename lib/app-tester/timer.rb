@@ -1,7 +1,7 @@
 module AppTester
   class Timer
 
-    def initialize(threshold=nil, message=nil, method=nil, *args)
+    def initialize(message=nil, threshold=nil, method=nil, *args)
       beginning_time = Time.now
       if block_given?
         yield

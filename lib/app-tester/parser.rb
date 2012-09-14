@@ -12,9 +12,13 @@ module AppTester
     # Public:
     attr_writer :num_arguments
 
+    # Public:
+    attr_accessor :mandatory_options
+
     def initialize options
       @options = { }
       @test_options = options
+      @mandatory_options = 0
       super do |x|
         x.separator ''
       end
