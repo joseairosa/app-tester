@@ -8,7 +8,7 @@ module AppTester
 
     include AppTester::Utils::Colours
 
-    def read_file_to_lines file
+    def file_to_array file
       lines = []
       File.open(file, "r") do |infile|
         while (line = infile.gets)
