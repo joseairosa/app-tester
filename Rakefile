@@ -1,5 +1,7 @@
 require 'rubygems'
 gem 'hoe', '>= 2.1.0'
+gem "json", "~> 1.7.5"
+gem "faraday", "~> 0.8.4"
 require 'hoe'
 require 'fileutils'
 require './lib/app-tester'
@@ -11,7 +13,7 @@ Hoe.plugin :newgem
 # Generate all the Rake tasks
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
 $hoe = Hoe.spec 'app-tester' do
-  self.developer 'José P. Airosa', 'me@joseairosa.com'
+  self.developer 'Jose P. Airosa', 'me@joseairosa.com'
   #self.post_install_message = 'PostInstall.txt' # TODO remove if post-install message not required
   self.rubyforge_name       = self.name # TODO this is default value
   # self.extra_deps         = [['activesupport','>= 2.0.2']]

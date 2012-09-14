@@ -6,5 +6,61 @@ module AppTester
 
   class << self
 
+    # Public: Environments that can be used
+    attr_reader :options
+
+    # Public: Container of tests
+    attr_reader :tests
+
+    STRING_SUCCESS="[\033[1;32mSUCCESS\033[0m]"
+    STRING_OK="[\033[1;34mOK\033[0m]"
+    STRING_DONE="[\033[1;32mDONE\033[0m]"
+    STRING_FAILED="[\033[1;31mFAILED\033[0m]"
+    STRING_WARNING="[\033[1;33mWARNING\033[0m]"
+
+    def new
+      @tests = {}
+      @options = AppTester::Options.new
+      yield @options if block_given?
+      self
+    end
+
+    def define_test name=""
+      if name.empty?
+        # throw name empty error
+      else
+        if block_given?
+          @tests[name.to_sym] = AppTester::Test.new(name, @options) do |parser_options|
+            yield parser_options
+          end
+        else
+          # throw block not given error
+        end
+      end
+    end
+
+    def get_test name
+      # throw error unless @tests.kind_of?(Proc)
+      # throw error unless @tests.includes?(name)
+      @tests[name.to_sym]
+    end
+
+    def set_options_for name
+      test = get_test name
+      yield test.parser
+    end
+
+    def run_test name, arguments=ARGV
+      get_test(name).run(arguments)
+    end
+
+    def load_libraries *libs
+      libs.each do |lib|
+        require_relative "app-tester/#{lib}"
+      end
+    end
+    alias load_library load_libraries
   end
+
+  load_libraries "core", "utils", "options", "test", "parser", "connection"
 end

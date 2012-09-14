@@ -1,7 +1,46 @@
 module AppTester
   class Test < Core
-    def initialize
+    # Public: Parser object. This will be user to handle the options provided by the user on a specific test
+    attr_reader :parser
 
+    # Public:
+    attr_reader :name
+
+    # Public:
+    attr_reader :source
+
+    # Public:
+    attr_reader :connection
+
+    # Public
+    attr_reader :options
+
+    def initialize name, options={ }
+      @name = name
+      @options = options
+      @source = Proc.new { |parser_options| yield(parser_options) }
+      @parser = AppTester::Parser.new(options)
+      @parser.banner = @name
+    end
+
+    def set_cmd_options
+      yield(@parser) if block_given?
+    end
+
+    def run(arguments=ARGV)
+      append_help_option
+      @parser.parse!(arguments)
+      @connection = AppTester::Connection.new @options.environments[@parser.options[:server]]
+      @source.call(self)
+    end
+
+    private
+
+    def append_help_option
+      @parser.set_option(nil, "-h", "--help", "Show this message") do
+        puts @parser
+        exit
+      end
     end
   end
 end
