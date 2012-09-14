@@ -3,6 +3,9 @@ require "optparse"
 module AppTester
   class Parser < OptionParser
 
+    #Public:
+    attr_reader :test_options
+
     # Public:
     attr_reader :options
 
@@ -12,15 +15,16 @@ module AppTester
 
     def initialize options
       @options = { }
+      @test_options = options
       super do |x|
         x.separator ''
       end
 
       # Fallback to the first entry on the environments list if there's not default environment selected
-      default_environment = options.default_environment.nil? ? options.environments.keys.first : options.default_environment
-      @options[:server] = options.environments[default_environment]
+      default_environment = @test_options.default_environment.nil? ? @test_options.environments.keys.first : @test_options.default_environment
+      @options[:server] = @test_options.environments[default_environment]
 
-      set_option(:server, "-s", "--server OPT", options.environments.keys, "Server to connect. Default: #{default_environment}")
+      set_option(:server, "-s", "--server OPT", @test_options.environments.keys, "Server to connect. Default: #{default_environment}")
     end
 
     def set_option(symbol, *opts, &block)
@@ -29,7 +33,12 @@ module AppTester
       #end
       if block.nil?
         on(*opts) do |x|
-          @options[symbol] = x
+          case symbol
+            when :server
+              @options[symbol] = @test_options.environments[x]
+            else
+              @options[symbol] = x
+          end
         end
       else
         on(*opts, &block)

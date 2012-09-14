@@ -18,7 +18,7 @@ module AppTester
     def initialize name, options={ }
       @name = name
       @options = options
-      @source = Proc.new { |parser_options| yield(parser_options) }
+      @source = Proc.new { |parser_options, connection| yield(parser_options, connection) }
       @parser = AppTester::Parser.new(options)
       @parser.banner = @name
     end
@@ -30,8 +30,8 @@ module AppTester
     def run(arguments=ARGV)
       append_help_option
       @parser.parse!(arguments)
-      @connection = AppTester::Connection.new @options.environments[@parser.options[:server]]
-      @source.call(self)
+      @connection = AppTester::Connection.new @parser.options[:server], @options
+      @source.call(@parser.options, @connection)
     end
 
     private

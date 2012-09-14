@@ -27,21 +27,20 @@ module AppTester
 
     def define_test name=""
       if name.empty?
-        # throw name empty error
+        raise AppTester::Error::NameEmptyError, "Attempted to define a test without a name"
       else
         if block_given?
-          @tests[name.to_sym] = AppTester::Test.new(name, @options) do |parser_options|
-            yield parser_options
+          @tests[name.to_sym] = AppTester::Test.new(name, @options) do |parser_options, connection|
+            yield parser_options, connection
           end
         else
-          # throw block not given error
+          @tests[name.to_sym] = nil
         end
       end
     end
 
     def get_test name
-      # throw error unless @tests.kind_of?(Proc)
-      # throw error unless @tests.includes?(name)
+      raise AppTester::Error::TestNotFoundError, "Could not find test #{name}" unless @tests.keys.include?(name.to_sym)
       @tests[name.to_sym]
     end
 
@@ -62,5 +61,5 @@ module AppTester
     alias load_library load_libraries
   end
 
-  load_libraries "core", "utils", "options", "test", "parser", "connection"
+  load_libraries "core", "utils", "options", "test", "parser", "connection", "exceptions"
 end

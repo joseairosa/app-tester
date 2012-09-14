@@ -31,7 +31,7 @@ describe "App Tester framework" do
       options.add_environment :development => "localhost://development"
     end
 
-    apptester.define_test "test arguments" do |this_test|
+    apptester.define_test "test arguments" do |options, connection|
       # blergh!
     end
 
@@ -47,12 +47,14 @@ describe "App Tester framework" do
 
     mock_arguments "-s" => "production"
 
-    apptester.define_test("test 1") do |this_test|
-      this_test.should be_a(AppTester::Test)
+    apptester.define_test("test 1") do |options, connection|
+      options.should be_a(Hash)
+      connection.should be_a(Faraday::Connection)
       "1"
     end
-    apptester.define_test("test 2") do |this_test|
-      this_test.should be_a(AppTester::Test)
+    apptester.define_test("test 2") do |options, connection|
+      options.should be_a(Hash)
+      connection.should be_a(Faraday::Connection)
       "2"
     end
     apptester.tests.size.should eq(2)
@@ -67,8 +69,8 @@ describe "App Tester framework" do
       options.add_environment :development => "localhost://development"
     end
 
-    apptester.define_test "test arguments" do |this_test|
-      this_test.parser.options[:server].should eq("localhost://production")
+    apptester.define_test "test arguments" do |options, connection|
+      options[:server].should eq("localhost://production")
     end
 
     apptester.run_test("test arguments", [])
@@ -82,8 +84,8 @@ describe "App Tester framework" do
       options.default_environment = :staging
     end
 
-    apptester.define_test "test arguments" do |this_test|
-      this_test.parser.options[:server].should eq("localhost://staging")
+    apptester.define_test "test arguments" do |options, connection|
+      options[:server].should eq("localhost://staging")
     end
 
     apptester.run_test("test arguments", [])
@@ -96,12 +98,15 @@ describe "App Tester framework" do
       options.add_environment :development => "localhost://development"
       options.default_environment = :staging
     end
-    apptester.define_test "test arguments" do |this_test|
-      this_test.should be_a(AppTester::Test)
-      this_test.parser.options.size.should be(2)
-      this_test.parser.options[:server].should_not be_empty
-      this_test.parser.options[:smiles_file].should_not be_empty
+
+    apptester.define_test "test arguments" do |options, connection|
+      options.should be_a(Hash)
+      connection.should be_a(Faraday::Connection)
+      options.size.should be(2)
+      options[:server].should_not be_empty
+      options[:smiles_file].should_not be_empty
     end
+
     apptester.set_options_for "test arguments" do |test_options|
       test_options.set_option(:smiles_file, "-f", "--smiles-file FILE", "File containing SMILES for query (one per line)")
     end
@@ -116,8 +121,8 @@ describe "App Tester framework" do
       options.add_environment :production => "http://www.google.com"
     end
 
-    apptester.define_test "test arguments" do |this_test|
-      this_test.connection.should be_a(AppTester::Connection)
+    apptester.define_test "test arguments" do |options, connection|
+      connection.should be_a(Faraday::Connection)
     end
 
     mocked_arguments = mock_arguments "-s" => "production"
@@ -130,8 +135,8 @@ describe "App Tester framework" do
       options.add_environment :production => "https://github.com"
     end
 
-    apptester.define_test "test arguments" do |this_test|
-      response = this_test.connection.get do |req|
+    apptester.define_test "test arguments" do |options, connection|
+      response = connection.get do |req|
         req.url "/"
       end
       response.status.should eq(200)
@@ -148,17 +153,22 @@ describe "App Tester framework" do
       options.add_environment :production => "http://aoisjdioasjdioasjod"
     end
 
-    apptester.define_test "test arguments" do |this_test|
-      response = this_test.connection.get do |req|
-        req.url "/"
+    apptester.define_test "test arguments" do |options, connection|
+      begin
+        response = connection.get do |req|
+          req.url "/"
+        end
+      rescue Exception => e
+        e.should be_a(Faraday::Error::ConnectionFailed)
       end
-      response.should raise_error Faraday::Error::ConnectionFailed
     end
 
     mocked_arguments = mock_arguments "-s" => "production"
 
     apptester.run_test("test arguments", mocked_arguments)
   end
+
+  # it should log connections if asked for
 
   def mock_arguments hash={ }
     hash.flatten
