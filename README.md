@@ -1,12 +1,12 @@
-= Gem: app-tester
+# Application Tester (app-tester)
 
 * http://github.com/joseairosa/app-tester
 
-== DESCRIPTION:
+## DESCRIPTION:
 
 This Gem will provide a framework to build command line functional tests against a web application (API, Website, etc)
 
-== FEATURES/PROBLEMS:
+## FEATURES/PROBLEMS:
 
 * Easily create functional tests with just a few lines of code
 * Since tests are built as command line tools they can be easily integrated with automatic tools
@@ -14,7 +14,7 @@ This Gem will provide a framework to build command line functional tests against
 * Add colors to make your tests more readable and easier to understand
 * Use pre-built tools to analyse your output or build your own
 
-== SYNOPSIS:
+## SYNOPSIS:
 
 ```ruby
 require "app-tester"
@@ -46,19 +46,41 @@ end
 apptester.run_test "my test"
 ```
 
-== REQUIREMENTS:
+## REQUIREMENTS:
 
-* FIX (list of requirements)
+* json >= 1.7.5
+* faraday >= 0.8.4
+* optparse
 
-== INSTALL:
+## INSTALL:
 
-* FIX (sudo gem install, anything else)
+It's very easy to install.
 
-== LICENSE:
+```
+gem install app-tester
+```
+
+Done! :)
+ 
+## Supported Ruby versions
+
+This library aims to support and is tested against the following Ruby
+implementations:
+
+* MRI 1.8.7
+* MRI 1.9.2
+* MRI 1.9.3
+* [JRuby][]
+* [Rubinius][]
+
+If something doesn't work on one of these interpreters, it should be considered
+a bug.
+
+## LICENSE:
 
 (The MIT License)
 
-Copyright (c) 2012 FIXME full name
+Copyright (c) 2012 José P. Airosa
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -78,3 +100,6 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  [jruby]:     http://jruby.org/
+  [rubinius]:  http://rubini.us/
