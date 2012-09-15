@@ -35,7 +35,7 @@ apptester.define_test "my test" do |options, connection|
   AppTester::Checker.status result
 
   # Convert a file to an array
-  AppTester::Utils.file_to_array options[:file]
+  p AppTester::Utils.file_to_array options[:file] unless options[:file].nil?
 end
 
 apptester.set_options_for "my test" do |test_options|
@@ -44,6 +44,35 @@ apptester.set_options_for "my test" do |test_options|
 end
 
 apptester.run_test "my test"
+```
+
+Assuming that this is in a file called my_test.rb, you can run it, via command line:
+
+```
+$ ruby my_test.rb --help
+```
+
+Will output:
+
+```
+my test
+
+    -s, --server OPT                 Server to connect. Default: google
+    -f, --file FILE                  File to load
+    -h, --help                       Show this message
+```
+
+Or you can run the test itself:
+
+```
+$ ruby my_test.rb -s github
+```
+
+Will output:
+
+```
+Connecting to https://github.com...
+[SUCCESS] got status 200
 ```
 
 ## REQUIREMENTS:
