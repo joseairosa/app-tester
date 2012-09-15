@@ -12,12 +12,12 @@ apptester.define_test "my test" do |options, connection|
   end
   AppTester::Checker.status result
 
-  p AppTester::Utils.file_to_array options[:file]
+  p AppTester::Utils.file_to_array options[:file] unless options[:file].nil?
 end
 
 apptester.set_options_for "my test" do |test_options|
   test_options.set_option(:file, "-f", "--file FILE", "File to load")
-  test_options.mandatory_options = 1
+  test_options.mandatory_options = 0
 end
 
 apptester.run_test "my test"
