@@ -31,8 +31,10 @@ apptester.define_test "my test" do |options, connection|
   result = connection.get do |request|
     request.url "/"
   end
+  # Check if we have a 200 OK or not
   AppTester::Checker.status result
 
+  # Convert a file to an array
   AppTester::Utils.file_to_array options[:file]
 end
 
