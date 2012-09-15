@@ -1,18 +1,48 @@
-= app-tester
+= Gem: app-tester
 
-* http://github.com/#{github_username}/#{project_name}
+* http://github.com/joseairosa/app-tester
 
 == DESCRIPTION:
 
-FIX (describe your package)
+This Gem will provide a framework to build command line functional tests against a web application (API, Website, etc)
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+* Easily create functional tests with just a few lines of code
+* Since tests are built as command line tools they can be easily integrated with automatic tools
+* Specify command line options in both short (-s, -f, etc...) and long (--server, --file, etc...) definition
+* Add colors to make your tests more readable and easier to understand
+* Use pre-built tools to analyse your output or build your own
 
 == SYNOPSIS:
 
-  FIX (code sample of usage)
+```ruby
+require "app-tester"
+
+# Initialize framework with test environments
+apptester = AppTester.new do |options|
+  options.add_environment :github => "https://github.com"
+  options.add_environment :google => "https://google.com"
+  options.default_environment = :google # A default environment can be specified
+end
+
+# Define your tests
+apptester.define_test "my test" do |options, connection|
+  result = connection.get do |request|
+    request.url "/"
+  end
+  AppTester::Checker.status result
+
+  AppTester::Utils.file_to_array options[:file]
+end
+
+apptester.set_options_for "my test" do |test_options|
+  test_options.set_option(:file, "-f", "--file FILE", "File to load")
+  test_options.mandatory_options = 1
+end
+
+apptester.run_test "my test"
+```
 
 == REQUIREMENTS:
 
