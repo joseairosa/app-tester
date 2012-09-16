@@ -31,9 +31,6 @@ module AppTester
     end
 
     def set_option(symbol, *opts, &block)
-      #proc = Proc.new do |x|
-      #  @options[symbol] = x
-      #end
       if block.nil?
         on(*opts) do |x|
           case symbol

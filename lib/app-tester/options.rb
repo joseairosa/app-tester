@@ -1,9 +1,11 @@
 module AppTester
-  class Options < Core
+  class Options
 
-    attr_accessor :environments
+    # Public:
     attr_accessor :default_environment
+    # Public:
     attr_accessor :log_connections
+    # Public:
     #attr_accessor :connection_retries
 
     def initialize
@@ -16,5 +18,10 @@ module AppTester
     def add_environment environment
       @environments.merge! environment
     end
+
+    private
+
+    # Private
+    attr_accessor :environments
   end
 end
