@@ -1,38 +1,29 @@
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
-# AppTester main module and namespace
+# @abstract AppTester main module and namespace
 module AppTester
   VERSION = '0.0.1'
 
-  # AppTester main class
+  # @abstract AppTester main class
+  # @attr_reader [AppTester::Options] Options container. This will be shared across other classes
+  # @attr_reader [Hash] A hash of tests. Values take the format of AppTester::Test
   class << self
 
-    # Public: Options container. This will be shared across other classes
     attr_reader :options
-
-    # Public: Tests container
     attr_reader :tests
 
-    # Contruct AppTester framework
+    # Construct AppTester framework
     #
-    # ==== Yields
-    #
-    # * +<i>AppTester::Options</i>+ - setup available options:
-    #                           add_environment: setup a new environment that can be accessed on the -s flag
-    #                           default_environment: setup default environment, this will be used when no -s flag is specified
-    #                           log_connection: activates Faraday log connection
-    #
-    # ==== Returns
-    #
-    # * AppTester class
-    #
-    # ==== Examples
-    #
+    # @yield [options] Gives the user the possibility to set generic options for the framework
+    # @yieldparam options [AppTester::Options] the options object
+    # @return [AppTester]
+    # @example Start AppTester handler
     #   apptester = AppTester.new do |options|
     #     options.add_environment :github => "https://github.com"
     #     options.add_environment :google => "https://google.com"
     #     options.default_environment = :google
+    #     options.log_connection = true
     #   end
     def new
       @tests = {}
@@ -43,40 +34,33 @@ module AppTester
 
     # Create a new test object
     #
-    # ==== Attributes
+    # @param name [String] name for this test
     #
-    # * +name <i>String</i>+ - name for this test
+    # @yield [cmd_options, connection] code snippet that will be executed when AppTester::Test.run is issued
+    # @yieldparam cmd_options [AppTester::Parser] user selected options on command line
+    # @yieldparam connection [Faraday::Connection] the connection handler to the server selected on command line (or default fallback)
     #
-    # ==== Yields
+    # @return [AppTester::Test] if the creation of this test was successfull with a block
+    # @return [NilClass] if the creation of this test was successfull with no block
     #
-    # * +<i>Proc</i>+ - code snippet that will executed when AppTester::Test.run is issued
+    # @raise [AppTester::Error::NameEmptyError] if name is empty
     #
-    # ==== Returns
-    #
-    # * AppTester::Test - test object
-    # * nil - if no block given
-    #
-    # ==== Raises
-    #
-    # * AppTester::Error::NameEmptyError - if name is empty
-    #
-    # ==== Examples
-    #
-    #   apptester.define_test "my test" do |options, connection|
+    # @example Define a new test
+    #   apptester.define_test "my test" do |cmd_options, connection|
     #     result = connection.get do |request|
     #       request.url "/"
     #     end
     #     AppTester::Checker.status result
     #
-    #     p AppTester::Utils.file_to_array options[:file] unless options[:file].nil?
+    #     p AppTester::Utils.file_to_array cmd_options[:file] unless cmd_options[:file].nil?
     #   end
     def define_test name=""
       if name.empty?
         raise AppTester::Error::NameEmptyError, "Attempted to define a test without a name"
       else
         if block_given?
-          @tests[name.to_sym] = AppTester::Test.new(name, @options) do |parser_options, connection|
-            yield parser_options, connection
+          @tests[name.to_sym] = AppTester::Test.new(name, @options) do |cmd_options, connection|
+            yield cmd_options, connection
           end
         else
           @tests[name.to_sym] = nil
@@ -86,20 +70,13 @@ module AppTester
 
     # Retrieve a test by name
     #
-    # ==== Attributes
+    # @param name [String] test to retrieve
     #
-    # * +name <i>String</i>+ - the test name
+    # @return [AppTester::Test] found test
     #
-    # ==== Returns
+    # @raise [AppTester::Error::TestNotFoundError] if no test was found
     #
-    # * +<i>AppTester:Test</i>+ - the found test
-    #
-    # ==== Raises
-    #
-    # * +<i>AppTester::Error::TestNotFoundError</i>+ - if no test was found
-    #
-    # ==== Examples
-    #
+    # @example Get a pre-defined test
     #   apptester = AppTester.new do |options|
     #     options.add_environment :github => "https://github.com"
     #     options.add_environment :google => "https://google.com"
@@ -115,20 +92,14 @@ module AppTester
 
     # Defines command line options for a given test
     #
-    # ==== Attributes
+    # @param name [String] test name to which we want to define the command line options
     #
-    # * +name <i>String</i>+ - the test name
+    # @return [AppTester::Test] the test for which we parsed the options
     #
-    # ==== Returns
+    # @yield [options_parser] set the command line options for this test
+    # @yieldparam cmd_options [AppTester::Parser] command line options parser object
     #
-    # * +<i>AppTester:Test</i>+ - the test for which we parse the options
-    #
-    # ==== Yields
-    #
-    # * +<i>AppTester::Parser</i>+
-    #
-    # ==== Examples
-    #
+    # @example Set options for a test
     #   apptester = AppTester.new do |options|
     #     options.add_environment :github => "https://github.com"
     #     options.add_environment :google => "https://google.com"
@@ -137,9 +108,9 @@ module AppTester
     #
     #   apptester.define_test "my test"
     #
-    #   apptester.set_options_for "my test" do |test_options|
-    #     test_options.set_option(:file, "-f", "--file FILE", "File to load")
-    #     test_options.mandatory_options = 0
+    #   apptester.set_options_for "my test" do |options_parser|
+    #     options_parser.set_option(:file, "-f", "--file FILE", "File to load")
+    #     options_parser.mandatory_options = 0
     #   end
     def set_options_for name
       test = get_test name
@@ -149,25 +120,31 @@ module AppTester
 
     # Run a test
     #
-    # ==== Attributes
+    # @param name [String] test name that we want to run
+    # @param arguments [Array] overwrite ARGV array with a custom one, useful for unit tests
     #
-    # * +name <i>String</i>+ - the test name
-    # * +arguments <i>Array</i>+ - overwrite ARGV array with a custom one, useful for unit tests
+    # @return [AppTester::Test] the test that we're running
     #
-    # ==== Returns
+    # @raise [AppTester::Error::TestNotFoundError] if no test was found
+    # @raise [OptionParser::MissingArgument] if there's a argument missing from a missmatch in the number of arguments given and mandatory_options on set_options_for method
+    # @raise [Faraday::Error::ConnectionFailed] if there was a problem connecting to the selected server
     #
-    # * +<i>AppTester::Test</i>+ - the test that we're running
+    # @example Run a test
+    #   apptester = AppTester.new do |options|
+    #     options.add_environment :github => "https://github.com"
+    #     options.add_environment :google => "https://google.com"
+    #     options.default_environment = :google
+    #   end
+    #   apptester.define_test "my test" do |cmd_options, connection|
+    #     result = connection.get do |request|
+    #       request.url "/"
+    #     end
+    #     AppTester::Checker.status result
     #
-    # ==== Raises
+    #     p AppTester::Utils.file_to_array cmd_options[:file] unless cmd_options[:file].nil?
+    #   end
     #
-    # * +<i>AppTester::Error::TestNotFoundError</i>+ - if no test was found
-    # * +<i>OptionParser::MissingArgument</i>+ - if there's a argument missing from a missmatch in the number of arguments given and mandatory_options on set_options_for method
-    # * +<i>Faraday::Error::ConnectionFailed</i>+ - if there was a problem connecting to the selected server
-    #
-    # ==== Examples
-    #
-    #   d = $surechem.java.document
-    #   d.get_documents("PATENTS", "US-4650884-A,US-5250534-A,US-4681893-A,US-5521184-A")
+    #   my_test = apptester.run_test
     def run_test name, arguments=ARGV
       the_test = get_test(name)
       the_test.run(arguments)
@@ -176,13 +153,9 @@ module AppTester
 
     # Load libraries to be used under this namespace
     #
-    # ==== Attributes
+    # @param libs [String] list of libraries to load
     #
-    # * +libs <i>String</i>+ - list of libraries to load
-    #
-    # ==== Returns
-    #
-    # * nil
+    # @return [NilClass]
     def load_libraries *libs
       libs.each do |lib|
         require_relative "app-tester/#{lib}"

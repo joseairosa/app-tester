@@ -1,6 +1,22 @@
 module AppTester
+  # @abstract Benchmark helper class
   class Timer
 
+    # Created a new timer object
+    #
+    # @param message [NilClass, String] custom message to be displayed
+    # @param threshold [Number] amount in ms. If this limit is passed a warning message will be displayed
+    # @param method [NilClass, Symbol] method to benchmark. Optional
+    # @param args [NilClass, String] arguments to be passed onto the method
+    #
+    # @yield code snipper to be benchmarked
+    #
+    # @example
+    #   apptester.define_test "my test 400 threshold" do |options, connection|
+    #     AppTester::Timer.new("test timer", 400) do
+    #       sleep 0.5
+    #     end
+    #   end
     def initialize(message=nil, threshold=nil, method=nil, *args)
       beginning_time = Time.now
       if block_given?

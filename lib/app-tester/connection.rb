@@ -1,11 +1,23 @@
 require "faraday"
 
 module AppTester
+  # @abstract Connection object that deals with communicating with Faraday to build new connections
+  # @attr_reader options [AppTester::Options] the options that the user defined when he created the framework
   class Connection
 
-    # Public:
     attr_reader :options
 
+    # Build a new connection handler
+    #
+    # @param url [String] the url that will be used to set up a new connection handler
+    # @param options [AppTester::Options] the options that the user defined when he created the framework
+    #
+    # @raise [OptionParser::InvalidArgument] if no url is specified
+    # @raise [Faraday::Error::ConnectionFailed] if there was a problem connecting to the url provided
+    #
+    # @return [Faraday::Connection] on successfull connection
+    #
+    # @todo Implement connection retry
     def self.new(url="", options={})
       @options = options
 

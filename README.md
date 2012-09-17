@@ -2,6 +2,8 @@
 
 * http://github.com/joseairosa/app-tester
 
+[![Build Status](https://secure.travis-ci.org/joseairosa/app-tester.png)](http://travis-ci.org/joseairosa/app-tester)
+
 ## DESCRIPTION:
 
 This Gem will provide a framework to build command line functional tests against a web application (API, Website, etc)
@@ -27,20 +29,21 @@ apptester = AppTester.new do |options|
 end
 
 # Define your tests
-apptester.define_test "my test" do |options, connection|
+apptester.define_test "my test" do |cmd_options, connection|
   result = connection.get do |request|
     request.url "/"
   end
+
   # Check if we have a 200 OK or not
   AppTester::Checker.status result
 
   # Convert a file to an array
-  p AppTester::Utils.file_to_array options[:file] unless options[:file].nil?
+  p AppTester::Utils.file_to_array cmd_options[:file] unless cmd_options[:file].nil?
 end
 
-apptester.set_options_for "my test" do |test_options|
-  test_options.set_option(:file, "-f", "--file FILE", "File to load")
-  test_options.mandatory_options = 1
+apptester.set_options_for "my test" do |options_parser|
+  options_parser.set_option(:file, "-f", "--file FILE", "File to load")
+  options_parser.mandatory_options = 1
 end
 
 apptester.run_test "my test"
@@ -90,6 +93,133 @@ gem install app-tester
 ```
 
 Done! :)
+
+## Adding colours to your tests
+
+AppTester has a useful helper class that enables anyone to add colours to the tests.
+Lets take the example where we want to output "Hello World" in 2 different colours.
+
+```ruby
+require "app-tester"
+
+# Initialize framework with test environments
+apptester = AppTester.new do |options|
+  options.add_environment :github => "https://github.com"
+  options.default_environment = :github # A default environment can be specified
+end
+
+# Define your tests
+apptester.define_test "my test" do |cmd_options, connection|
+  result = connection.get do |request|
+    request.url "/"
+  end
+
+  puts "#{AppTester::Utils::Colours.red("Hello")} #{AppTester::Utils::Colours.green("World")}"
+end
+
+apptester.run_test "my test"
+```
+
+Available colours are:
+
+* black
+* blue
+* green
+* cyan
+* red
+* purple
+* brown
+* light_gray
+* dark_gray
+* light_blue
+* light_green
+* light_cyan
+* light_red
+* light_purple
+* yellow
+* white
+
+## Benchmarking
+
+You can benchmark your test. This is very useful to understand if anything is underperforming.
+Tests can be nested inside each other.
+
+```
+require "app-tester"
+
+# Initialize framework with test environments
+apptester = AppTester.new do |options|
+  options.add_environment :github => "https://github.com"
+  options.default_environment = :github # A default environment can be specified
+end
+
+# Define your tests
+apptester.define_test "my test" do |cmd_options, connection|
+  result = connection.get do |request|
+    request.url "/"
+  end
+
+  AppTester::Timer.new("test timer 1") do
+    sleep 1
+  end
+
+  AppTester::Timer.new("test timer 2") do
+    sleep 1
+    AppTester::Timer.new("test timer 2.1") do
+      sleep 1
+    end
+  end
+end
+
+apptester.run_test "my test"
+```
+
+This will output:
+
+```
+$ ruby examples/benchmark.rb
+Connecting to https://github.com...
+   Time elapsed to test timer 1, 1001.086 milliseconds
+   Time elapsed to test timer 2.1, 1000.12 milliseconds
+   Time elapsed to test timer 2, 2001.204 milliseconds
+```
+
+## Reading from a file
+
+File are extremely usefull tools.
+We can have, for example, a functional test to an API where we want to run 100 strings against an end-point. For this you only need to create a new plain text file, write 1 string per line and use this gem to read them.
+
+Here is an example:
+
+```
+require "app-tester"
+
+apptester = AppTester.new do |options|
+  options.add_environment :github => "https://github.com"
+  options.add_environment :google => "https://google.com"
+  options.default_environment = :google
+end
+
+apptester.define_test "my test" do |cmd_options, connection|
+  result = connection.get do |request|
+    request.url "/"
+  end
+  AppTester::Checker.status result
+
+  my_file = AppTester::Utils.file_to_array cmd_options[:file]
+
+  my_file.each do |line|
+    # do awesome stuff with line
+  end
+end
+
+apptester.set_options_for "my test" do |options_parser|
+  options_parser.set_option(:file, "-f", "--file FILE", "File to load")
+  options_parser.mandatory_options = 1
+end
+
+apptester.run_test "my test"
+```
  
 ## Supported Ruby versions
 

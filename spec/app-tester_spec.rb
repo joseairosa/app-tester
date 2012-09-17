@@ -40,16 +40,14 @@ describe "App Tester framework" do
     apptester.define_test("test 1") do |options, connection|
       options.should be_a(Hash)
       connection.should be_a(Faraday::Connection)
-      "1"
     end
     apptester.define_test("test 2") do |options, connection|
       options.should be_a(Hash)
       connection.should be_a(Faraday::Connection)
-      "2"
     end
     apptester.tests.size.should eq(2)
-    apptester.run_test("test 1").should eq("1")
-    apptester.run_test("test 2").should eq("2")
+    apptester.run_test("test 1").should be_a(AppTester::Test)
+    apptester.run_test("test 2").should be_a(AppTester::Test)
   end
 
   it "should define a test without a default environment" do
