@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
     s.email = %q{me@joseairosa.com}
     s.homepage = %q{https://github.com/joseairosa/app-tester}
     s.license = 'MIT'
-    s.post_install_message = "\033[0;32mThanks for installing! You're awesome ^_^\033[0m"
+    s.post_install_message = "\033[0;32mThanks for installing! You're awesome! ^_^\033[0m"
 
     s.test_files = %w(spec/app-tester_spec.rb)
 
