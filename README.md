@@ -144,7 +144,7 @@ Available colours are:
 You can benchmark your test. This is very useful to understand if anything is underperforming.
 Tests can be nested inside each other.
 
-```
+```ruby
 require "app-tester"
 
 # Initialize framework with test environments
@@ -191,7 +191,7 @@ We can have, for example, a functional test to an API where we want to run 100 s
 
 Here is an example:
 
-```
+```ruby
 require "app-tester"
 
 apptester = AppTester.new do |options|
