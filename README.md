@@ -2,8 +2,6 @@
 
 * http://github.com/joseairosa/app-tester
 
-[![Build Status](https://secure.travis-ci.org/joseairosa/app-tester.png)](http://travis-ci.org/joseairosa/app-tester)
-
 ## DESCRIPTION:
 
 This Gem will provide a framework to build command line functional tests against a web application (API, Website, etc)
