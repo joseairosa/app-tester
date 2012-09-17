@@ -15,6 +15,6 @@ To use rspec for testing you must install rspec gem:
 end
 
 desc "Run the specs under spec/models"
-RSpec::Core::RakeTask.new(:spec) do |t|
+RSpec::Core::RakeTask.new(:rspec) do |t|
   t.rspec_opts = ['--options=' "spec/spec.opts"]
 end
