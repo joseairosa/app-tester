@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
     s.license = 'MIT'
     s.post_install_message = "\033[0;32mThanks for installing! You're awesome! ^_^\033[0m"
 
-    s.test_files = %w(spec/app-tester_spec.rb)
+    s.test_files = %w(spec/*)
 
     s.files = Dir[
         "lib/**/*.rb",
@@ -27,4 +27,6 @@ Gem::Specification.new do |s|
     s.rubyforge_project = "app-tester"
     s.add_dependency "json", ">= 1.7.5"
     s.add_dependency "faraday", ">= 0.8.4"
+    s.add_development_dependency "rake"
+    s.add_development_dependency "rspec"
 end
