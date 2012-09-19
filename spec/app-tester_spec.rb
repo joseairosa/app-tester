@@ -25,7 +25,7 @@ describe "App Tester framework" do
   it "should return help when asked for it" do
     apptester = start_app_tester
 
-    apptester.define_test "my test" do |options, connection|
+    apptester.define_test "my test" do
       # blergh!
     end
 
@@ -37,12 +37,12 @@ describe "App Tester framework" do
 
     mock_arguments "-s" => "production"
 
-    apptester.define_test("test 1") do |options, connection|
-      options.should be_a(Hash)
+    apptester.define_test("test 1") do
+      arguments.should be_a(Hash)
       connection.should be_a(Faraday::Connection)
     end
-    apptester.define_test("test 2") do |options, connection|
-      options.should be_a(Hash)
+    apptester.define_test("test 2") do
+      arguments.should be_a(Hash)
       connection.should be_a(Faraday::Connection)
     end
     apptester.tests.size.should eq(2)
@@ -53,8 +53,8 @@ describe "App Tester framework" do
   it "should define a test without a default environment" do
     apptester = start_app_tester
 
-    apptester.define_test "my test" do |options, connection|
-      options[:server].should eq("localhost://production")
+    apptester.define_test "my test" do
+      arguments[:server].should eq("localhost://production")
     end
 
     apptester.run_test("my test", [])
@@ -63,8 +63,8 @@ describe "App Tester framework" do
   it "should define a test with a default environment" do
     apptester = start_app_tester nil, :staging
 
-    apptester.define_test "my test" do |options, connection|
-      options[:server].should eq("localhost://staging")
+    apptester.define_test "my test" do
+      arguments[:server].should eq("localhost://staging")
     end
 
     apptester.run_test("my test", [])
@@ -73,12 +73,12 @@ describe "App Tester framework" do
   it "should define a test, set custom options and run" do
     apptester = start_app_tester
 
-    apptester.define_test "my test" do |options, connection|
-      options.should be_a(Hash)
+    apptester.define_test "my test" do
+      arguments.should be_a(Hash)
       connection.should be_a(Faraday::Connection)
-      options.size.should be(2)
-      options[:server].should_not be_empty
-      options[:smiles_file].should_not be_empty
+      arguments.size.should be(2)
+      arguments[:server].should_not be_empty
+      arguments[:smiles_file].should_not be_empty
     end
 
     apptester.set_options_for "my test" do |test_options|
@@ -93,7 +93,7 @@ describe "App Tester framework" do
   it "should define a test, set custom options, define number mandatory options and run" do
     apptester = start_app_tester
 
-    apptester.define_test "my test" do |options, connection|
+    apptester.define_test "my test" do
 
     end
 
@@ -110,7 +110,7 @@ describe "App Tester framework" do
   it "should create a connection" do
     apptester = start_app_tester :production => "http://www.google.com"
 
-    apptester.define_test "my test" do |options, connection|
+    apptester.define_test "my test" do
       connection.should be_a(Faraday::Connection)
     end
 
@@ -122,12 +122,12 @@ describe "App Tester framework" do
   it "should fetch contents of a connection" do
     apptester = start_app_tester :production => "https://github.com"
 
-    apptester.define_test "my test" do |options, connection|
-      response = connection.get do |req|
-        req.url "/"
-      end
+    apptester.define_test "my test" do
+      response = get "/"
       response.status.should eq(200)
       response.body.should include("github")
+      response = post "/"
+      response.status.should eq(403)
     end
 
     mocked_arguments = mock_arguments "-s" => "production"
@@ -138,11 +138,9 @@ describe "App Tester framework" do
   it "should return exception on connection failed" do
     apptester = start_app_tester :production => "http://aoisjdioasjdioasjod"
 
-    apptester.define_test "my test" do |options, connection|
+    apptester.define_test "my test" do
       begin
-        response = connection.get do |req|
-          req.url "/"
-        end
+        response = get "/"
       rescue Exception => e
         e.should be_a(Faraday::Error::ConnectionFailed)
       end
@@ -156,10 +154,8 @@ describe "App Tester framework" do
   it "should check status" do
     apptester = start_app_tester :production => "https://github.com"
 
-    apptester.define_test "my test" do |options, connection|
-      response = connection.get do |req|
-        req.url "/"
-      end
+    apptester.define_test "my test" do
+      response = get "/"
       AppTester::Checker.status response
     end
 
@@ -173,10 +169,8 @@ describe "App Tester framework" do
   it "should log connections if asked for" do
     apptester = start_app_tester({ :production => "https://github.com" }, nil, true)
 
-    apptester.define_test "my test" do |options, connection|
-      response = connection.get do |req|
-        req.url "/"
-      end
+    apptester.define_test "my test" do
+      response = get "/"
     end
 
     mocked_arguments = mock_arguments "-s" => "production"
@@ -219,7 +213,7 @@ describe "App Tester framework" do
   it "should time the execution" do
     apptester = start_app_tester
 
-    apptester.define_test "my test" do |options, connection|
+    apptester.define_test "my test" do
       AppTester::Timer.new("test timer") do
         sleep 1
       end
@@ -233,13 +227,13 @@ describe "App Tester framework" do
   it "should time the execution with threshold" do
     apptester = start_app_tester
 
-    apptester.define_test "my test 400 threshold" do |options, connection|
+    apptester.define_test "my test 400 threshold" do
       AppTester::Timer.new("test timer", 400) do
         sleep 0.5
       end
     end
 
-    apptester.define_test "my test 600 threshold" do |options, connection|
+    apptester.define_test "my test 600 threshold" do
       AppTester::Timer.new("test timer", 600) do
         sleep 0.5
       end

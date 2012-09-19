@@ -3,7 +3,7 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 # @abstract AppTester main module and namespace
 module AppTester
-  VERSION = '0.0.1'
+  VERSION = '0.1.0'
 
   # @abstract AppTester main class
   # @attr_reader [AppTester::Options] Options container. This will be shared across other classes
@@ -36,9 +36,7 @@ module AppTester
     #
     # @param name [String] name for this test
     #
-    # @yield [cmd_options, connection] code snippet that will be executed when AppTester::Test.run is issued
-    # @yieldparam cmd_options [AppTester::Parser] user selected options on command line
-    # @yieldparam connection [Faraday::Connection] the connection handler to the server selected on command line (or default fallback)
+    # @yield code snippet that will be executed when AppTester::Test.run is issued
     #
     # @return [AppTester::Test] if the creation of this test was successfull with a block
     # @return [NilClass] if the creation of this test was successfull with no block
@@ -54,14 +52,12 @@ module AppTester
     #
     #     p AppTester::Utils.file_to_array cmd_options[:file] unless cmd_options[:file].nil?
     #   end
-    def define_test name=""
+    def define_test name="", &block
       if name.empty?
         raise AppTester::Error::NameEmptyError, "Attempted to define a test without a name"
       else
         if block_given?
-          @tests[name.to_sym] = AppTester::Test.new(name, @options) do |cmd_options, connection|
-            yield cmd_options, connection
-          end
+          @tests[name.to_sym] = AppTester::Test.new(name, @options, &block)
         else
           @tests[name.to_sym] = nil
         end

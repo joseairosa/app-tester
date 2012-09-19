@@ -1,3 +1,6 @@
+require "rspec"
+require "rspec-expectations"
+
 module AppTester
   # @abstract Main object that hold all the data needed to run a test
   # @attr_reader parser [AppTester::Parser] user selected options on command line
@@ -13,10 +16,14 @@ module AppTester
     attr_reader :connection
     attr_reader :options
 
-    def initialize name, options={ }
+    attr_writer :self_before_instance_eval
+
+    include RSpec::Matchers
+
+    def initialize name, options={ }, &block
       @name = name
       @options = options
-      @source = Proc.new { |parser_options, connection| yield(parser_options, connection) }
+      @source = block
       @parser = AppTester::Parser.new(options)
       @parser.banner = @name
     end
@@ -26,6 +33,22 @@ module AppTester
       yield(@parser) if block_given?
     end
 
+    def arguments
+      @parser.options
+    end
+
+    def get url="", parameters={}
+      connection.get do |request|
+        request.url "/", parameters
+      end
+    end
+
+    def post url="", parameters={}
+      connection.post do |request|
+        request.url url, parameters
+      end
+    end
+
     # Run test
     def run(arguments=ARGV)
       append_help_option
@@ -33,7 +56,22 @@ module AppTester
       # Make sure we have enough arguments
       raise OptionParser::MissingArgument if @parser.mandatory_options + 2 > @parser.options.size + 1
       @connection = AppTester::Connection.new @parser.options[:server], @options
-      @source.call(@parser.options, @connection)
+      @self_before_instance_eval = eval "self", @source.binding
+      begin
+        self.instance_eval &@source
+      rescue RSpec::Expectations::ExpectationNotMetError => excp
+        unless defined? IS_RSPEC
+          backtrace = excp.backtrace.map { |x|
+            x.match(/^(.+?):(\d+)(|:in `(.+)')$/);
+            [$1, $2, $4]
+          }
+          line_number = 0
+          backtrace.each do |array|
+            line_number = array[1] if array[2] == "block in <main>"
+          end
+          puts "#{AppTester::Utils::Strings::FAILED} #{excp.message} on line #{line_number}"
+        end
+      end
     end
 
     private

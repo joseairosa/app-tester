@@ -1,9 +1,11 @@
 PATH
   remote: .
   specs:
-    app-tester (0.0.1)
+    app-tester (0.1.0)
       faraday (>= 0.8.4)
       json (>= 1.7.5)
+      rspec (>= 2.11.0)
+      rspec-expectations (>= 2.11.3)
 
 GEM
   remote: https://rubygems.org/

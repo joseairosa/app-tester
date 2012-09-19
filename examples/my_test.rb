@@ -6,13 +6,12 @@ apptester = AppTester.new do |options|
   options.default_environment = :google
 end
 
-apptester.define_test "my test" do |cmd_options, connection|
-  result = connection.get do |request|
-    request.url "/"
-  end
+apptester.define_test "my test" do
+  result = get "/"
+
   AppTester::Checker.status result
 
-  p AppTester::Utils.file_to_array cmd_options[:file] unless cmd_options[:file].nil?
+  p AppTester::Utils.file_to_array arguments[:file] unless arguments[:file].nil?
 end
 
 apptester.set_options_for "my test" do |options_parser|

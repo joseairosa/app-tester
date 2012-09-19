@@ -7,10 +7,8 @@ apptester = AppTester.new do |options|
 end
 
 # Define your tests
-apptester.define_test "my test" do |cmd_options, connection|
-  result = connection.get do |request|
-    request.url "/"
-  end
+apptester.define_test "my test" do
+  result = get "/"
 
   puts "#{AppTester::Utils::Colours.red("Hello")} #{AppTester::Utils::Colours.green("World")}"
 end

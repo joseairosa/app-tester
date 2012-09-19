@@ -6,13 +6,14 @@ apptester = AppTester.new do |options|
   options.default_environment = :google
 end
 
-apptester.define_test "my test" do |cmd_options, connection|
-  result = connection.get do |request|
-    request.url "/"
-  end
+apptester.define_test "my test" do
+  result = get "/"
+
   AppTester::Checker.status result
 
-  my_file = AppTester::Utils.file_to_array cmd_options[:file]
+  my_file = AppTester::Utils.file_to_array arguments[:file]
+
+  my_file.should be_a(Hash)
 
   my_file.each do |line|
     # do awesome stuff with line

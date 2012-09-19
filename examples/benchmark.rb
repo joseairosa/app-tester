@@ -8,9 +8,7 @@ end
 
 # Define your tests
 apptester.define_test "my test" do |cmd_options, connection|
-  result = connection.get do |request|
-    request.url "/"
-  end
+  result = get "/"
 
   AppTester::Timer.new("test timer 1") do
     sleep 1

@@ -1,14 +1,16 @@
 # Application Tester (app-tester)
 
-* http://github.com/joseairosa/app-tester
+* This page: http://github.com/joseairosa/app-tester
+* Rubygems: http://rubygems.org/gems/app-tester
+* Documentation: http://i.am.joseairosa.com/gems/app-tester/
 
 [![Build Status](https://secure.travis-ci.org/joseairosa/app-tester.png)](http://travis-ci.org/joseairosa/app-tester)
 
-## DESCRIPTION:
+## Description
 
 This Gem will provide a framework to build command line functional tests against a web application (API, Website, etc)
 
-## FEATURES/PROBLEMS:
+## Features
 
 * Easily create functional tests with just a few lines of code
 * Since tests are built as command line tools they can be easily integrated with automatic tools
@@ -16,7 +18,7 @@ This Gem will provide a framework to build command line functional tests against
 * Add colors to make your tests more readable and easier to understand
 * Use pre-built tools to analyse your output or build your own
 
-## SYNOPSIS:
+## Introduction
 
 ```ruby
 require "app-tester"
@@ -29,16 +31,21 @@ apptester = AppTester.new do |options|
 end
 
 # Define your tests
-apptester.define_test "my test" do |cmd_options, connection|
-  result = connection.get do |request|
-    request.url "/"
-  end
+apptester.define_test "my test" do |arguments, connection|
+  # Perform a get request to "/"
+  result1 = get "/"
+  # Perform a post request to "/" with token as parameter
+  result2 = get "/", :token => "hello"
+  # Perform a post request to "/"
+  result3 = post "/"
+  # Perform a post request to "/" with token as parameter
+  result4 = post "/", :token => "hello"
 
   # Check if we have a 200 OK or not
-  AppTester::Checker.status result
+  AppTester::Checker.status result1
 
   # Convert a file to an array
-  p AppTester::Utils.file_to_array cmd_options[:file] unless cmd_options[:file].nil?
+  p AppTester::Utils.file_to_array arguments[:file] unless arguments[:file].nil?
 end
 
 apptester.set_options_for "my test" do |options_parser|
@@ -78,13 +85,13 @@ Connecting to https://github.com...
 [SUCCESS] got status 200
 ```
 
-## REQUIREMENTS:
+## Requirements
 
 * json >= 1.7.5
 * faraday >= 0.8.4
 * optparse
 
-## INSTALL:
+## Intall
 
 It's very easy to install.
 
@@ -109,10 +116,8 @@ apptester = AppTester.new do |options|
 end
 
 # Define your tests
-apptester.define_test "my test" do |cmd_options, connection|
-  result = connection.get do |request|
-    request.url "/"
-  end
+apptester.define_test "my test" do |arguments, connection|
+  result = get "/"
 
   puts "#{AppTester::Utils::Colours.red("Hello")} #{AppTester::Utils::Colours.green("World")}"
 end
@@ -154,10 +159,8 @@ apptester = AppTester.new do |options|
 end
 
 # Define your tests
-apptester.define_test "my test" do |cmd_options, connection|
-  result = connection.get do |request|
-    request.url "/"
-  end
+apptester.define_test "my test" do |arguments, connection|
+  result = get "/"
 
   AppTester::Timer.new("test timer 1") do
     sleep 1
@@ -200,13 +203,12 @@ apptester = AppTester.new do |options|
   options.default_environment = :google
 end
 
-apptester.define_test "my test" do |cmd_options, connection|
-  result = connection.get do |request|
-    request.url "/"
-  end
+apptester.define_test "my test" do |arguments, connection|
+  result = get "/"
+
   AppTester::Checker.status result
 
-  my_file = AppTester::Utils.file_to_array cmd_options[:file]
+  my_file = AppTester::Utils.file_to_array arguments[:file]
 
   my_file.each do |line|
     # do awesome stuff with line
