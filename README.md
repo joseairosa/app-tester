@@ -134,7 +134,7 @@ Connecting to https://google.com...
      got: true on line 12
 ```
 
-Take a loot at [RSpec::Matches][] for more information on which matchers you can use
+Take a loot at [RSpec::Matches](http://rubydoc.info/gems/rspec-expectations/2.4.0/RSpec/Matchers) for more information on which matchers you can use
 
 ## Adding colours to your tests
 
@@ -296,7 +296,6 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-  [rspec_matches]:  http://rubydoc.info/gems/rspec-expectations/2.4.0/RSpec/Matchers
+  
   [jruby]:          http://jruby.org/
   [rubinius]:       http://rubini.us/
