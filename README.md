@@ -91,7 +91,7 @@ Connecting to https://github.com...
 * faraday >= 0.8.4
 * optparse
 
-## Intall
+## Install
 
 It's very easy to install.
 
@@ -100,6 +100,41 @@ gem install app-tester
 ```
 
 Done! :)
+
+## Dealing with expectations
+
+One of the really nice features of this gem is that resembles a lot how RSpec works in terms of expectations.
+
+So lets assume that you want to test some kind of expectation:
+
+```ruby
+require "app-tester"
+
+apptester = AppTester.new do |options|
+  options.add_environment :github => "https://github.com"
+  options.add_environment :google => "https://google.com"
+  options.default_environment = :google
+end
+
+apptester.define_test "my test to fail" do
+  var = true
+
+  var.should be_nil
+end
+
+apptester.run_test "my test to fail"
+```
+
+When you run this test you'll get the following output:
+
+```
+$ ruby examples/expectations.rb
+Connecting to https://google.com...
+[FAILED] expected: nil
+     got: true on line 12
+```
+
+Take a loot at [RSpec::Matches][] for more information on which matchers you can use
 
 ## Adding colours to your tests
 
@@ -262,5 +297,6 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  [jruby]:     http://jruby.org/
-  [rubinius]:  http://rubini.us/
+  [rspec_matches]:  http://rubydoc.info/gems/rspec-expectations/2.4.0/RSpec/Matchers
+  [jruby]:          http://jruby.org/
+  [rubinius]:       http://rubini.us/
