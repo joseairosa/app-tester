@@ -38,15 +38,11 @@ module AppTester
     end
 
     def get url="", parameters={}
-      connection.get do |request|
-        request.url "/", parameters
-      end
+      connection.get url, parameters
     end
 
     def post url="", parameters={}
-      connection.post do |request|
-        request.url url, parameters
-      end
+      connection.post url, parameters
     end
 
     # Run test
