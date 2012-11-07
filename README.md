@@ -31,7 +31,7 @@ apptester = AppTester.new do |options|
 end
 
 # Define your tests
-apptester.define_test "my test" do |arguments, connection|
+apptester.define_test "my test" do
   # Perform a get request to "/"
   result1 = get "/"
   # Perform a post request to "/" with token as parameter
@@ -151,7 +151,7 @@ apptester = AppTester.new do |options|
 end
 
 # Define your tests
-apptester.define_test "my test" do |arguments, connection|
+apptester.define_test "my test"
   result = get "/"
 
   puts "#{AppTester::Utils::Colours.red("Hello")} #{AppTester::Utils::Colours.green("World")}"
@@ -194,7 +194,7 @@ apptester = AppTester.new do |options|
 end
 
 # Define your tests
-apptester.define_test "my test" do |arguments, connection|
+apptester.define_test "my test" do
   result = get "/"
 
   AppTester::Timer.new("test timer 1") do
@@ -238,7 +238,7 @@ apptester = AppTester.new do |options|
   options.default_environment = :google
 end
 
-apptester.define_test "my test" do |arguments, connection|
+apptester.define_test "my test" do
   result = get "/"
 
   AppTester::Checker.status result
