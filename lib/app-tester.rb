@@ -80,10 +80,10 @@ module AppTester
     #   apptester.define_test "my test"
     #   my_test = apptester.get_test "my test"
     def get_test name
-      if ! @tests.find {|t| t[:title] == name }
-        raise AppTester::Error::TestNotFoundError, "Could not find test #{name}"
-      end
       entry = @tests.find { |t| t[:title] == name }
+      if entry.nil?
+        raise AppTester::Error::TestNotFoundError, "Could not find test #{name}" 
+      end
       entry[:test]
     end
 
@@ -144,6 +144,15 @@ module AppTester
       the_test = get_test(name)
       the_test.run(arguments)
       the_test
+    end
+    
+    # Run all tests
+    #
+    # @raise [Faraday::Error::ConnectionFailed] if there was a problem connecting to the selected server
+    def run_all
+      @tests.each do |test|
+        run_test test[:title]
+      end
     end
 
     # Load libraries to be used under this namespace
