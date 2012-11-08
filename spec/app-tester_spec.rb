@@ -104,22 +104,6 @@ describe "App Tester framework" do
     apptester.run_test("my test", mocked_arguments)
   end
 
-  it "should define a test, set custom options and run" do
-    apptester = start_app_tester
-
-    apptester.define_test "my test" do
-
-    end
-
-    apptester.set_options_for "my test" do |test_options|
-      test_options.set_option(:smiles_file, "-f", "--smiles-file FILE", "File containing SMILES for query (one per line)")
-    end
-
-    mocked_arguments = mock_arguments "-s" => "development"
-
-    lambda { apptester.run_test("my test", mocked_arguments) }.should raise_error OptionParser::MissingArgument
-  end
-
   it "should create a connection" do
     apptester = start_app_tester :production => "http://www.google.com"
 
