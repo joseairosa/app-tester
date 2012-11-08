@@ -5,6 +5,8 @@ require 'tempfile'
 # http://rspec.info/
 describe "App Tester framework" do
 
+  let(:dummy_test) { Proc.new {} }
+
   it "should initialize" do
     # violated "Be sure to write your specs"
     apptester = AppTester.new
@@ -36,66 +38,48 @@ describe "App Tester framework" do
     apptester = start_app_tester
 
     mock_arguments "-s" => "production"
+    test = apptester.define_test("test 1",&dummy_test)
 
-    apptester.define_test("test 1") do
-      arguments.should be_a(Hash)
-      connection.should be_a(Faraday::Connection)
-    end
-    apptester.define_test("test 2") do
-      arguments.should be_a(Hash)
-      connection.should be_a(Faraday::Connection)
-    end
-    apptester.tests.size.should eq(2)
+    apptester.tests.size.should eq(1)
     apptester.run_test("test 1").should be_a(AppTester::Test)
-    apptester.run_test("test 2").should be_a(AppTester::Test)
+    test.arguments.should be_a(Hash)
+    test.connection.should be_a(Faraday::Connection)
   end
 
   it "should define a test without a default environment" do
     apptester = start_app_tester
-
-    apptester.define_test "my test" do
-      arguments[:server].should eq("localhost://production")
-    end
-
+    test = apptester.define_test "my test",&dummy_test
     apptester.run_test("my test", [])
+    test.arguments[:server].should eq("localhost://production")
   end
 
   it "should define a test with a default environment" do
     apptester = start_app_tester nil, :staging
-
-    apptester.define_test "my test" do
-      arguments[:server].should eq("localhost://staging")
-    end
-
+    test = apptester.define_test "my test",&dummy_test
     apptester.run_test("my test", [])
+    test.arguments[:server].should eq("localhost://staging")
   end
 
   it "should define a test, set custom options and run" do
     apptester = start_app_tester
-
-    apptester.define_test "my test" do
-      arguments.should be_a(Hash)
-      connection.should be_a(Faraday::Connection)
-      arguments.size.should be(2)
-      arguments[:server].should_not be_empty
-      arguments[:smiles_file].should_not be_empty
-    end
-
+    test = apptester.define_test "my test",&dummy_test
     apptester.set_options_for "my test" do |test_options|
       test_options.set_option(:smiles_file, "-f", "--smiles-file FILE", "File containing SMILES for query (one per line)")
     end
-
     mocked_arguments = mock_arguments "-s" => "development", "-f" => "../../file.txt"
-
     apptester.run_test("my test", mocked_arguments)
+
+    test.arguments.should be_a(Hash)
+    test.connection.should be_a(Faraday::Connection)
+    test.arguments.size.should be(2)
+    test.arguments[:server].should_not be_empty
+    test.arguments[:smiles_file].should_not be_empty
   end
 
   it "should define a test, set custom options, define number mandatory options and run" do
     apptester = start_app_tester
 
-    apptester.define_test "my test" do
-
-    end
+    apptester.define_test "my test",&dummy_test
 
     apptester.set_options_for "my test" do |test_options|
       test_options.set_option(:smiles_file, "-f", "--smiles-file FILE", "File containing SMILES for query (one per line)")
@@ -110,19 +94,19 @@ describe "App Tester framework" do
   it "should create a connection" do
     apptester = start_app_tester :production => "http://www.google.com"
 
-    apptester.define_test "my test" do
-      connection.should be_a(Faraday::Connection)
-    end
+    test = apptester.define_test "my test",&dummy_test
 
     mocked_arguments = mock_arguments "-s" => "production"
 
     apptester.run_test("my test", mocked_arguments)
+    test.connection.should be_a(Faraday::Connection)
   end
-
-  it "should fetch contents of a connection" do
+  
+  # this should be in a unit test
+  xit "should fetch contents of a connection" do
     apptester = start_app_tester :production => "https://github.com"
 
-    apptester.define_test "my test" do
+    test = apptester.define_test "my test" do
       response = get "/"
       response.status.should eq(200)
       response.body.should include("github")
@@ -134,8 +118,9 @@ describe "App Tester framework" do
 
     apptester.run_test("my test", mocked_arguments)
   end
-
-  it "should return exception on connection failed" do
+  
+  # this should be in a unit test
+  xit "should return exception on connection failed" do
     apptester = start_app_tester :production => "http://aoisjdioasjdioasjod"
 
     apptester.define_test "my test" do
