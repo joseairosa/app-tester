@@ -22,7 +22,6 @@ end
 
 apptester.set_options_for "my test" do |options_parser|
   options_parser.set_option(:file, "-f", "--file FILE", "File to load")
-  options_parser.mandatory_options = 1
 end
 
 apptester.run_test "my test"

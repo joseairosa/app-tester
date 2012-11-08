@@ -5,13 +5,10 @@ module AppTester
   # @see http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html
   # @attr_reader test_options [AppTester::Options] the options that the user defined when he created the framework
   # @attr_reader options [Hash] command line arguments that were set when executing the script
-  # @attr_writer mandatory_options [Number] minimum number of command line arguments for this script to run
   class Parser < OptionParser
 
     attr_reader :test_options
     attr_reader :options
-
-    attr_accessor :mandatory_options
 
     # Build Parser object. Automatically builds with --server argument
     #
@@ -21,7 +18,6 @@ module AppTester
     def initialize options
       @options = { }
       @test_options = options
-      @mandatory_options = 0
       @mandatory_arguments = {}
       @missing_arguments = []
       super do |x|
@@ -62,7 +58,7 @@ module AppTester
     def check_mandatory_arguments
       @mandatory_arguments.each{|a| a = a[1]; @missing_arguments << "Please supply #{a[:argument]} / #{a[:switch]}" unless @options[a[:key]] }
       @missing_arguments.each{|a| puts a }
-      exit if @missing_arguments.any?
+      exit(1) if @missing_arguments.any?
     end
 
   end
