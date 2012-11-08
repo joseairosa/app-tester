@@ -107,7 +107,6 @@ module AppTester
     #
     #   apptester.set_options_for "my test" do |options_parser|
     #     options_parser.set_option(:file, "-f", "--file FILE", "File to load")
-    #     options_parser.mandatory_options = 0
     #   end
     def set_options_for name
       test = get_test name
@@ -123,7 +122,6 @@ module AppTester
     # @return [AppTester::Test] the test that we're running
     #
     # @raise [AppTester::Error::TestNotFoundError] if no test was found
-    # @raise [OptionParser::MissingArgument] if there's a argument missing from a missmatch in the number of arguments given and mandatory_options on set_options_for method
     # @raise [Faraday::Error::ConnectionFailed] if there was a problem connecting to the selected server
     #
     # @example Run a test
