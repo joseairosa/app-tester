@@ -22,6 +22,20 @@ describe "App Tester framework" do
     apptester.options.environments[:development].should eq("localhost://development")
   end
 
+  it "should exit if a mandatory arguemnt is missing" do
+    apptester = start_app_tester
+
+    apptester.define_test "my test" do
+    end
+
+    apptester.set_options_for "my test" do |test_options|
+      test_options.set_option(:smiles_file, "-f", "--smiles-file FILE", "File containing SMILES for query (one per line)", true)
+    end
+
+    STDOUT.should_receive(:puts).with("Please supply -f / --smiles-file FILE")
+    lambda { apptester.run_test("my test") }.should raise_error(SystemExit)
+  end
+
   it "should return help when asked for it" do
     apptester = start_app_tester
 
