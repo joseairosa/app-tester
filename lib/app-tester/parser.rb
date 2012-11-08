@@ -22,6 +22,7 @@ module AppTester
       @options = { }
       @test_options = options
       @mandatory_options = 0
+      @mandatory_arguments = {}
       super do |x|
         x.separator ''
       end
@@ -42,6 +43,7 @@ module AppTester
     # @see AppTester
     # @see OptionParser
     def set_option(symbol, *opts, &block)
+      @mandatory_arguments[symbol] = {:key => symbol, :argument => opts[0], :switch => opts[1]} if opts[3] == true
       if block.nil?
         on(*opts) do |x|
           case symbol
@@ -54,6 +56,7 @@ module AppTester
       else
         on(*opts, &block)
       end
+      @mandatory_arguments.each{|a| a = a[1] ;  abort("Please supply #{a[:argument]} / #{a[:switch]}") unless @options[a[:key]] }
     end
 
   end
