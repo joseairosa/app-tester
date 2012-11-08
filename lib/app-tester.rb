@@ -3,7 +3,7 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 # @abstract AppTester main module and namespace
 module AppTester
-  VERSION = '0.1.0'
+  VERSION = '0.1.1'
 
   # @abstract AppTester main class
   # @attr_reader [AppTester::Options] Options container. This will be shared across other classes
