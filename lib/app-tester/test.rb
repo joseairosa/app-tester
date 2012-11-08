@@ -45,6 +45,8 @@ module AppTester
       connection.post url, parameters
     end
 
+    BacktraceObject = Struct.new(:path, :line_number, :where)
+
     # Run test
     def run(arguments=ARGV)
       append_help_option
@@ -56,13 +58,15 @@ module AppTester
         self.instance_eval &@source
       rescue RSpec::Expectations::ExpectationNotMetError => excp
         unless defined? IS_RSPEC
+          # Extract and create a backtrace object
           backtrace = excp.backtrace.map { |x|
             x.match(/^(.+?):(\d+)(|:in `(.+)')$/);
-            [$1, $2, $4]
+            BacktraceObject.new($1, $2, $4)
           }
           line_number = 0
-          backtrace.each do |array|
-            line_number = array[1] if array[2] == "block in <main>"
+          # Because the correct line number is not the first on the error stack we need to iterate it and find what we want
+          backtrace.each do |backtrace_entry|
+            line_number = backtrace_entry.line_number if backtrace_entry.where == "block in <main>"
           end
           puts "#{AppTester::Utils::Strings::FAILED} #{excp.message} on line #{line_number}"
         end
