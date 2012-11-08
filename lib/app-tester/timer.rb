@@ -26,20 +26,16 @@ module AppTester
       end
       end_time = Time.now
       time_passed = ((end_time - beginning_time)*1000).round(3)
-      printf "   "
 
       threshold_message = ""
       unless threshold.nil?
         printf "#{AppTester::Utils::Strings::WARNING} " if time_passed.to_f > threshold.to_f
         threshold_message = " (threshold: #{threshold} ms)"
       end
-
-      if message.nil?
-        puts AppTester::Utils::Colours.dark_gray "Time elapsed #{time_passed} milliseconds#{threshold_message}"
-      else
-        puts AppTester::Utils::Colours.dark_gray "Time elapsed to #{message}, #{time_passed} milliseconds#{threshold_message}"
-      end
+      message = "to #{message}," if message
+      puts "Time elapsed #{message} #{time_passed} milliseconds#{threshold_message}"
+      puts ""
     end
-
   end
+
 end
