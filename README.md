@@ -50,11 +50,20 @@ end
 
 apptester.set_options_for "my test" do |options_parser|
   options_parser.set_option(:file, "-f", "--file FILE", "File to load")
-  options_parser.mandatory_options = 1
 end
 
 apptester.run_test "my test"
 ```
+
+You can set mandatory arguments for your tests by passing true as the final argument to set_option :
+
+```
+  apptester.set_options_for "my test" do |options_parser|
+    options_parser.set_option(:file, "-f", "--file FILE", "File to load", true)
+  end
+  
+```
+
 
 Assuming that this is in a file called my_test.rb, you can run it, via command line:
 
@@ -252,7 +261,6 @@ end
 
 apptester.set_options_for "my test" do |options_parser|
   options_parser.set_option(:file, "-f", "--file FILE", "File to load")
-  options_parser.mandatory_options = 1
 end
 
 apptester.run_test "my test"
