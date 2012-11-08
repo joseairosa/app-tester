@@ -23,6 +23,7 @@ module AppTester
       @test_options = options
       @mandatory_options = 0
       @mandatory_arguments = {}
+      @missing_arguments = []
       super do |x|
         x.separator ''
       end
@@ -56,7 +57,12 @@ module AppTester
       else
         on(*opts, &block)
       end
-      @mandatory_arguments.each{|a| a = a[1] ;  abort("Please supply #{a[:argument]} / #{a[:switch]}") unless @options[a[:key]] }
+    end
+
+    def check_mandatory_arguments
+      @mandatory_arguments.each{|a| a = a[1]; @missing_arguments << "Please supply #{a[:argument]} / #{a[:switch]}" unless @options[a[:key]] }
+      @missing_arguments.each{|a| puts a }
+      exit if @missing_arguments.any?
     end
 
   end
