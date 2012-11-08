@@ -49,8 +49,7 @@ module AppTester
     def run(arguments=ARGV)
       append_help_option
       @parser.parse!(arguments)
-      # Make sure we have enough arguments
-      raise OptionParser::MissingArgument if @parser.mandatory_options + 2 > @parser.options.size + 1
+      @parser.check_mandatory_arguments
       @connection = AppTester::Connection.new @parser.options[:server], @options
       @self_before_instance_eval = eval "self", @source.binding
       begin
