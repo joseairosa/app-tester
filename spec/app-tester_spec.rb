@@ -5,8 +5,6 @@ require 'tempfile'
 # http://rspec.info/
 describe "App Tester framework" do
 
-  let(:dummy_test) { Proc.new {} }
-
   it "should initialize" do
     # violated "Be sure to write your specs"
     apptester = AppTester.new
@@ -27,9 +25,7 @@ describe "App Tester framework" do
   it "should return help when asked for it" do
     apptester = start_app_tester
 
-    apptester.define_test "my test" do
-      # blergh!
-    end
+    apptester.define_test "my test"
 
     lambda { apptester.run_test("my test", ["--help"]) }.should raise_error SystemExit
   end
@@ -38,7 +34,7 @@ describe "App Tester framework" do
     apptester = start_app_tester
 
     mock_arguments "-s" => "production"
-    test = apptester.define_test("test 1",&dummy_test)
+    test = apptester.define_test "test 1"
 
     apptester.tests.size.should eq(1)
     apptester.run_test("test 1").should be_a(AppTester::Test)
@@ -48,21 +44,21 @@ describe "App Tester framework" do
 
   it "should define a test without a default environment" do
     apptester = start_app_tester
-    test = apptester.define_test "my test",&dummy_test
+    test = apptester.define_test "my test"
     apptester.run_test("my test", [])
     test.arguments[:server].should eq("localhost://production")
   end
 
   it "should define a test with a default environment" do
     apptester = start_app_tester nil, :staging
-    test = apptester.define_test "my test",&dummy_test
+    test = apptester.define_test "my test"
     apptester.run_test("my test", [])
     test.arguments[:server].should eq("localhost://staging")
   end
 
   it "should define a test, set custom options and run" do
     apptester = start_app_tester
-    test = apptester.define_test "my test",&dummy_test
+    test = apptester.define_test "my test"
     apptester.set_options_for "my test" do |test_options|
       test_options.set_option(:smiles_file, "-f", "--smiles-file FILE", "File containing SMILES for query (one per line)")
     end
@@ -79,7 +75,7 @@ describe "App Tester framework" do
   it "should define a test, set custom options, define number mandatory options and run" do
     apptester = start_app_tester
 
-    apptester.define_test "my test",&dummy_test
+    apptester.define_test "my test"
 
     apptester.set_options_for "my test" do |test_options|
       test_options.set_option(:smiles_file, "-f", "--smiles-file FILE", "File containing SMILES for query (one per line)")
@@ -94,7 +90,7 @@ describe "App Tester framework" do
   it "should create a connection" do
     apptester = start_app_tester :production => "http://www.google.com"
 
-    test = apptester.define_test "my test",&dummy_test
+    test = apptester.define_test "my test"
 
     mocked_arguments = mock_arguments "-s" => "production"
 
