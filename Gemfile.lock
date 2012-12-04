@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    app-tester (0.1.0)
+    app-tester (0.1.1)
       faraday (>= 0.8.4)
       json (>= 1.7.5)
       rspec (>= 2.11.0)

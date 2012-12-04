@@ -145,7 +145,7 @@ module AppTester
       the_test.run(arguments)
       the_test
     end
-    
+
     # Run all tests
     #
     # @raise [Faraday::Error::ConnectionFailed] if there was a problem connecting to the selected server
@@ -155,6 +155,7 @@ module AppTester
       end
     end
 
+    private
     # Load libraries to be used under this namespace
     #
     # @param libs [String] list of libraries to load
