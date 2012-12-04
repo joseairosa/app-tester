@@ -1,6 +1,6 @@
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
-
+##
 # @abstract AppTester main module and namespace
 module AppTester
   VERSION = '0.1.4'
@@ -26,7 +26,7 @@ module AppTester
     #     options.log_connection = true
     #   end
     def new
-      @tests = {}
+      @tests = []
       @options = AppTester::Options.new
       yield @options if block_given?
       self
@@ -55,13 +55,11 @@ module AppTester
     def define_test name="", &block
       if name.empty?
         raise AppTester::Error::NameEmptyError, "Attempted to define a test without a name"
-      else
-        if block_given?
-          @tests[name.to_sym] = AppTester::Test.new(name, @options, &block)
-        else
-          @tests[name.to_sym] = nil
-        end
       end
+      block = Proc.new{} unless block_given?
+      test = AppTester::Test.new(name, @options, &block)
+      @tests.push title: name, test: test
+      test
     end
 
     # Retrieve a test by name
@@ -82,8 +80,11 @@ module AppTester
     #   apptester.define_test "my test"
     #   my_test = apptester.get_test "my test"
     def get_test name
-      raise AppTester::Error::TestNotFoundError, "Could not find test #{name}" unless @tests.keys.include?(name.to_sym)
-      @tests[name.to_sym]
+      entry = @tests.find { |t| t[:title] == name }
+      if entry.nil?
+        raise AppTester::Error::TestNotFoundError, "Could not find test #{name}" 
+      end
+      entry[:test]
     end
 
     # Defines command line options for a given test
@@ -145,6 +146,16 @@ module AppTester
       the_test
     end
 
+    # Run all tests
+    #
+    # @raise [Faraday::Error::ConnectionFailed] if there was a problem connecting to the selected server
+    def run_all
+      @tests.each do |test|
+        run_test test[:title]
+      end
+    end
+
+    private
     # Load libraries to be used under this namespace
     #
     # @param libs [String] list of libraries to load
