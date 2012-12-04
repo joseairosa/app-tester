@@ -29,12 +29,16 @@ module AppTester
       @options[:server] = @test_options.environments[default_environment]
 
       set_option(:server, "-s", "--server OPT", @test_options.environments.keys, "Server to connect. Default: #{default_environment}")
+
+      options.default_options.each do |opt|
+        set_option(opt[:symbol].to_sym, *opt[:opts], &opt[:block])
+      end
     end
 
     # Add a new option to our optparser
     #
     # @param symbol [Symbol] identifier that will be used on the yielded block on define_test
-    # @param opts [String] command line options definition
+    # @param opts [Array] command line options definition
     # @param block [Proc] custom code to be executed. Optional
     #
     # @see AppTester
