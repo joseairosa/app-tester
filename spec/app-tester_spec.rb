@@ -1,6 +1,5 @@
 require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'tempfile'
-
 # Time to add your specs!
 # http://rspec.info/
 describe "App Tester framework" do
@@ -22,10 +21,26 @@ describe "App Tester framework" do
     apptester.options.environments[:development].should eq("localhost://development")
   end
 
+  describe "when setting a default option" do
+    before do
+      apptester = AppTester.new do |options|
+        options.add_default_option(:something, '-a', '--something SOMETHING', 'Say something')
+      end
+      @test = apptester.define_test 'my test'
+    end
+    let(:received_options) { @test.options.default_options }
+    let(:option) { received_options[0] }
+
+    it { received_options.size.should == 1 }
+    it { option[:symbol].should eq(:something) }
+    it { option[:opts].should eq(['-a','--something SOMETHING','Say something']) }
+    it { option[:block].should be_nil }
+  end
+
   it "should exit if a mandatory arguemnt is missing" do
     apptester = start_app_tester
 
-    apptester.define_test "my test" 
+    apptester.define_test "my test"
 
     apptester.set_options_for "my test" do |test_options|
       test_options.set_option(:smiles_file, "-f", "--smiles-file FILE", "File containing SMILES for query (one per line)", true)

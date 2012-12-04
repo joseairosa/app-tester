@@ -28,6 +28,7 @@ apptester = AppTester.new do |options|
   options.add_environment :github => "https://github.com"
   options.add_environment :google => "https://google.com"
   options.default_environment = :google # A default environment can be specified
+  options.add_default_option(:something, '-a', '--something', 'this is an option')
 end
 
 # Define your tests
@@ -46,6 +47,7 @@ apptester.define_test "my test" do
 
   # Convert a file to an array
   p AppTester::Utils.file_to_array arguments[:file] unless arguments[:file].nil?
+  
 end
 
 apptester.set_options_for "my test" do |options_parser|
@@ -61,6 +63,9 @@ for this use the following syntax:
 ```
 apptester.run_all
 ```
+
+You can set a default_option with hte AppTester initialization block,
+this option will be inherited by all the defined tests.
 
 You can set mandatory arguments for your tests by passing true as the final argument to set_option :
 

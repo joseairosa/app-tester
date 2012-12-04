@@ -9,11 +9,13 @@ module AppTester
     attr_accessor :default_environment
     attr_accessor :log_connections
     attr_accessor :environments
+    attr_accessor :default_options
 
     def initialize
       @environments = {}
       @default_environment = nil
       @log_connections = false
+      @default_options = []
     end
 
     # Add a new environment to the environment list. This will be used when constructing AppTester::Parser object
@@ -24,6 +26,10 @@ module AppTester
     def add_environment environment
       @environments.merge! environment
       self
+    end
+
+    def add_default_option(symbol, *opts, &block)
+      @default_options << {symbol: symbol, opts: opts, block: block }
     end
   end
 end
