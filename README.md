@@ -55,8 +55,7 @@ end
 apptester.run_test "my test"
 ```
 
-You can define multiple tests just adding more define_test blocks, in
-this case you might want to run all of them using the syntax:
+You can define multiple tests by adding more define_test blocks. In this case you might want to run them all, and for this use the following syntax:
 
 ```
 apptester.run_all
