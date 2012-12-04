@@ -55,6 +55,13 @@ end
 apptester.run_test "my test"
 ```
 
+You can define multiple tests just adding more define_test blocks, in
+this case you might want to run all of them using the syntax:
+
+```
+apptester.run_all
+```
+
 You can set mandatory arguments for your tests by passing true as the final argument to set_option :
 
 ```
