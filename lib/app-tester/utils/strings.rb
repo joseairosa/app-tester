@@ -6,6 +6,7 @@ module AppTester
       DONE="[#{AppTester::Utils::Colours.green "OK"}]"
       FAILED="[#{AppTester::Utils::Colours.red "FAILED"}]"
       WARNING="[#{AppTester::Utils::Colours.yellow "WARNING"}]"
+      TEST_HEADING="[#{AppTester::Utils::Colours.purple "TEST"}]"
     end
   end
 end
